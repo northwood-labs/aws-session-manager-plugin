@@ -19,8 +19,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/ssm"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -137,7 +137,6 @@ func TestStartSessionCommand_validateStartSessionInputWithoutRequiredParameters(
 }
 
 func TestStartSessionCommand_validateStartSessionInputWithInvalidParameters(t *testing.T) {
-
 	parameters := map[string][]string{INSTANCE_ID: nil, "random-params": nil}
 	command := &StartSessionCommand{}
 	validation := command.validateStartSessionInput(parameters)

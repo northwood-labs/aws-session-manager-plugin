@@ -139,14 +139,12 @@ func (config *LogConfig) startWatcher(logger T) {
 
 // ReplaceLogger replaces the current logger with a new logger initialized from the current configurations file
 func (config *LogConfig) replaceLogger() {
-
 	// Get the current logger
 	logger := getCached()
 
-	//Create new logger
+	// Create new logger
 	logConfigBytes := config.GetLogConfigBytes()
 	baseLogger, err := initBaseLoggerFromBytes(logConfigBytes)
-
 	// If err in creating logger, do not replace logger
 	if err != nil {
 		logger.Error("New logger creation failed")

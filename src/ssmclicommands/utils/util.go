@@ -60,7 +60,6 @@ func GetFlag(val string) string {
 
 // IsHelp determines if a subcommand or flag is a request for help
 func IsHelp(subcommand string, parameters map[string][]string) bool {
-
 	if subcommand == HelpFlag {
 		return true
 	}

@@ -15,12 +15,12 @@
 package portsession
 
 import (
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/jsonutil"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session"
-	"github.com/aws/session-manager-plugin/src/version"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/jsonutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/version"
 )
 
 const (
@@ -122,7 +122,10 @@ func (s *PortSession) SetSessionHandlers(log log.T) (err error) {
 }
 
 // ProcessStreamMessagePayload writes messages received on datachannel to stdout
-func (s *PortSession) ProcessStreamMessagePayload(log log.T, outputMessage message.ClientMessage) (isHandlerReady bool, err error) {
+func (s *PortSession) ProcessStreamMessagePayload(
+	log log.T,
+	outputMessage message.ClientMessage,
+) (isHandlerReady bool, err error) {
 	if s.portSessionType.IsStreamNotSet() {
 		log.Debugf("Waiting for streams to be established before processing incoming messages.")
 		return false, nil

@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/twinj/uuid"
 )
@@ -167,7 +167,6 @@ func TestPutString(t *testing.T) {
 	for _, tc := range testCases {
 		testString := fmt.Sprintf("Running test case: %s", tc.name)
 		t.Run(testString, func(t *testing.T) {
-
 			// Asserting type as string for input
 			strInput, ok := tc.input.(string)
 			assert.True(t, ok, "Type assertion failed in %s:%s", t.Name(), tc.name)
@@ -234,7 +233,6 @@ func TestPutBytes(t *testing.T) {
 	for _, tc := range testCases {
 		testString := fmt.Sprintf("Running test case: %s", tc.name)
 		t.Run(testString, func(t *testing.T) {
-
 			// Assert type as byte array
 			byteInput, ok := tc.input.([]byte)
 			assert.True(t, ok, "Type assertion failed in %s:%s", t.Name(), tc.name)
@@ -351,10 +349,15 @@ func TestPutLong(t *testing.T) {
 	for _, tc := range testCases {
 		testString := fmt.Sprintf("Running test case: %s", tc.name)
 		t.Run(testString, func(t *testing.T) {
-
 			// Assert type as long int
 			longInput, ok := tc.input.(int)
-			assert.True(t, reflect.DeepEqual(tc.input, longInput), "Cast went wrong. Expected: %v, Got: %v", tc.input, longInput)
+			assert.True(
+				t,
+				reflect.DeepEqual(tc.input, longInput),
+				"Cast went wrong. Expected: %v, Got: %v",
+				tc.input,
+				longInput,
+			)
 			assert.True(t, ok, "Type assertion failed in %s:%s", t.Name(), tc.name)
 
 			err := putLong(
@@ -437,10 +440,15 @@ func TestPutInteger(t *testing.T) {
 	for _, tc := range testCases {
 		testString := fmt.Sprintf("Running test case: %s", tc.name)
 		t.Run(testString, func(t *testing.T) {
-
 			// Assert type as long int
 			intInput, ok := tc.input.(int)
-			assert.True(t, reflect.DeepEqual(tc.input, intInput), "Cast went wrong. Expected: %v, Got: %v", tc.input, intInput)
+			assert.True(
+				t,
+				reflect.DeepEqual(tc.input, intInput),
+				"Cast went wrong. Expected: %v, Got: %v",
+				tc.input,
+				intInput,
+			)
 			assert.True(t, ok, "Type assertion failed in %s:%s", t.Name(), tc.name)
 
 			err := putInteger(
@@ -674,7 +682,7 @@ func TestClientMessage_Validate(t *testing.T) {
 		SchemaVersion:  schemaVersion,
 		SequenceNumber: 1,
 		Flags:          2,
-		MessageId:      u,
+		MessageId:      *u,
 		Payload:        payload,
 		PayloadLength:  3,
 	}
@@ -712,7 +720,7 @@ func TestClientMessage_ValidateStartPublicationMessage(t *testing.T) {
 		SchemaVersion:  schemaVersion,
 		SequenceNumber: 1,
 		Flags:          2,
-		MessageId:      u,
+		MessageId:      *u,
 		Payload:        payload,
 		PayloadLength:  3,
 		MessageType:    StartPublicationMessage,
@@ -865,13 +873,14 @@ func TestPutUuid(t *testing.T) {
 				mockLogger,
 				tc.byteArray,
 				tc.offsetStart,
-				uuidInput)
+				*uuidInput,
+			)
 			if tc.expectation == SUCCESS {
 				assert.Nil(t, err, "%s:%s threw an error when no error was expected.", t.Name(), tc.name)
 				strExpected := tc.expected.(string)
 				uuidOut, _ := uuid.Parse(strExpected)
 				expectedBuffer := get16ByteBuffer()
-				putUuid(mockLogger, expectedBuffer, 0, uuidOut)
+				putUuid(mockLogger, expectedBuffer, 0, *uuidOut)
 				assert.Equal(t, tc.byteArray, expectedBuffer)
 			} else if tc.expectation == ERROR {
 				assert.Error(t, err, "%s:%s did not throw an error when an error was expected.", t.Name(), tc.name)
@@ -891,7 +900,6 @@ func TestPutGetString(t *testing.T) {
 	result, err := getString(log.NewMockLog(), input, 1, 8)
 	assert.Nil(t, err)
 	assert.Equal(t, "hello", result)
-
 }
 
 func TestPutGetInteger(t *testing.T) {
@@ -945,7 +953,6 @@ func TestGetBytesFromInteger(t *testing.T) {
 }
 
 func TestSerializeAndDeserializeClientMessage(t *testing.T) {
-
 	u, _ := uuid.Parse(messageId)
 
 	clientMessage := ClientMessage{
@@ -954,7 +961,7 @@ func TestSerializeAndDeserializeClientMessage(t *testing.T) {
 		CreatedDate:    createdDate,
 		SequenceNumber: 1,
 		Flags:          2,
-		MessageId:      u,
+		MessageId:      *u,
 		Payload:        payload,
 	}
 
@@ -962,7 +969,12 @@ func TestSerializeAndDeserializeClientMessage(t *testing.T) {
 	serializedBytes, err := clientMessage.SerializeClientMessage(log.NewMockLog())
 	assert.Nil(t, err, "Error serializing message")
 
-	seralizedMessageType := strings.TrimRight(string(serializedBytes[ClientMessage_MessageTypeOffset:ClientMessage_MessageTypeOffset+ClientMessage_MessageTypeLength-1]), " ")
+	seralizedMessageType := strings.TrimRight(
+		string(
+			serializedBytes[ClientMessage_MessageTypeOffset:ClientMessage_MessageTypeOffset+ClientMessage_MessageTypeLength-1],
+		),
+		" ",
+	)
 	assert.Equal(t, seralizedMessageType, messageType)
 
 	serializedVersion, err := getUInteger(log.NewMockLog(), serializedBytes, ClientMessage_SchemaVersionOffset)
@@ -985,14 +997,19 @@ func TestSerializeAndDeserializeClientMessage(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, seralizedMessageId.String(), messageId)
 
-	serializedDigest, err := getBytes(log.NewMockLog(), serializedBytes, ClientMessage_PayloadDigestOffset, ClientMessage_PayloadDigestLength)
+	serializedDigest, err := getBytes(
+		log.NewMockLog(),
+		serializedBytes,
+		ClientMessage_PayloadDigestOffset,
+		ClientMessage_PayloadDigestLength,
+	)
 	assert.Nil(t, err)
 	hasher := sha256.New()
 	hasher.Write(clientMessage.Payload)
 	expectedHash := hasher.Sum(nil)
 	assert.True(t, reflect.DeepEqual(serializedDigest, expectedHash))
 
-	//Test DeserializeClientMessage
+	// Test DeserializeClientMessage
 	deserializedClientMessage := &ClientMessage{}
 	err = deserializedClientMessage.DeserializeClientMessage(log.NewMockLog(), serializedBytes)
 	assert.Nil(t, err)
@@ -1006,7 +1023,7 @@ func TestSerializeAndDeserializeClientMessage(t *testing.T) {
 }
 
 func TestSerializeMessagePayloadNegative(t *testing.T) {
-	var functionEx = func() {}
+	functionEx := func() {}
 	_, err := SerializeClientMessagePayload(mockLogger, functionEx)
 	assert.NotNil(t, err)
 }
@@ -1023,7 +1040,9 @@ func TestSerializeAndDeserializeClientMessageWithAcknowledgeContent(t *testing.T
 	deserializedClientMsg := &ClientMessage{}
 	err = deserializedClientMsg.DeserializeClientMessage(log.NewMockLog(), serializedClientMsg)
 	assert.Nil(t, err)
-	deserializedAcknowledgeContent, err := deserializedClientMsg.DeserializeDataStreamAcknowledgeContent(log.NewMockLog())
+	deserializedAcknowledgeContent, err := deserializedClientMsg.DeserializeDataStreamAcknowledgeContent(
+		log.NewMockLog(),
+	)
 
 	assert.Nil(t, err)
 	assert.Equal(t, messageType, deserializedAcknowledgeContent.MessageType)
@@ -1050,7 +1069,7 @@ func TestDeserializeAgentMessageWithChannelClosed(t *testing.T) {
 		CreatedDate:    createdDate,
 		SequenceNumber: 1,
 		Flags:          2,
-		MessageId:      u,
+		MessageId:      *u,
 		Payload:        channelClosedJson,
 	}
 

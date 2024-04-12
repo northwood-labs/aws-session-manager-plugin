@@ -17,8 +17,8 @@ package version
 import (
 	"testing"
 
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,7 +58,10 @@ func TestDoesAgentSupportTCPMultiplexing(t *testing.T) {
 
 func TestDoesAgentSupportTerminateSessionFlag(t *testing.T) {
 	// Test exact version of feature; TerminateSessionFlag supported after 2.3.722.0
-	assert.False(t, DoesAgentSupportTerminateSessionFlag(mockLog, config.TerminateSessionFlagSupportedAfterThisAgentVersion))
+	assert.False(
+		t,
+		DoesAgentSupportTerminateSessionFlag(mockLog, config.TerminateSessionFlagSupportedAfterThisAgentVersion),
+	)
 
 	// Test versions prior to feature implementation
 	oldVersions := []string{
@@ -117,12 +120,26 @@ func TestIsAgentVersionGreaterThanSupportedVersionEdgeCases(t *testing.T) {
 	t.Run("Non-numeric strings", func(t *testing.T) {
 		errorLog := log.NewMockLog()
 		notNumberCase := Comparison{"randomString", "randomString"}
-		assert.False(t, isAgentVersionGreaterThanSupportedVersion(errorLog, notNumberCase.agentVersion, notNumberCase.supportedVersion))
+		assert.False(
+			t,
+			isAgentVersionGreaterThanSupportedVersion(
+				errorLog,
+				notNumberCase.agentVersion,
+				notNumberCase.supportedVersion,
+			),
+		)
 	})
 	t.Run("Uneven-length strings", func(t *testing.T) {
 		errorLog := log.NewMockLog()
 		unevenLengthCase := Comparison{"1.4.1.2.4.1", "3.0.0.0"}
-		assert.False(t, isAgentVersionGreaterThanSupportedVersion(errorLog, unevenLengthCase.agentVersion, unevenLengthCase.supportedVersion))
+		assert.False(
+			t,
+			isAgentVersionGreaterThanSupportedVersion(
+				errorLog,
+				unevenLengthCase.agentVersion,
+				unevenLengthCase.supportedVersion,
+			),
+		)
 	})
 	t.Run("Invalid Version Numbers", func(t *testing.T) {
 		errorLog := log.NewMockLog()

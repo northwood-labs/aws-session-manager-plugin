@@ -25,14 +25,14 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
-	communicatorMocks "github.com/aws/session-manager-plugin/src/communicator/mocks"
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/encryption"
-	"github.com/aws/session-manager-plugin/src/encryption/mocks"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
-	"github.com/aws/session-manager-plugin/src/version"
 	"github.com/gorilla/websocket"
+	communicatorMocks "github.com/northwood-labs/aws-session-manager-plugin/src/communicator/mocks"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/encryption"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/encryption/mocks"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/version"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/twinj/uuid"
@@ -447,7 +447,7 @@ func TestHandshakeRequestHandler(t *testing.T) {
 	handshakeResponseMatcher := func(sentData []byte) bool {
 		clientMessage := &message.ClientMessage{}
 		clientMessage.DeserializeClientMessage(mockLogger, sentData)
-		var handshakeResponse = message.HandshakeResponsePayload{}
+		handshakeResponse := message.HandshakeResponsePayload{}
 		json.Unmarshal(clientMessage.Payload, &handshakeResponse)
 		// Return true if any other message type (typically to account for acknowledge)
 		if clientMessage.MessageType != message.OutputStreamMessage {
@@ -512,13 +512,16 @@ func TestHandleOutputMessageForExitCodePayloadTypeWithError(t *testing.T) {
 func TestHandleHandshakeRequestWithMessageDeserializeError(t *testing.T) {
 	dataChannel := getDataChannel()
 	handshakeRequestBytes, _ := json.Marshal(buildHandshakeRequest())
-	//Using HandshakeCompletePayloadType to trigger the type check error
+	// Using HandshakeCompletePayloadType to trigger the type check error
 	clientMessage := getClientMessage(0, message.OutputStreamMessage,
 		uint32(message.HandshakeCompletePayloadType), handshakeRequestBytes)
 
 	err := dataChannel.handleHandshakeRequest(mockLogger, clientMessage)
 	assert.NotNil(t, err)
-	assert.True(t, strings.Contains(err.Error(), "ClientMessage PayloadType is not of type HandshakeRequestPayloadType"))
+	assert.True(
+		t,
+		strings.Contains(err.Error(), "ClientMessage PayloadType is not of type HandshakeRequestPayloadType"),
+	)
 }
 
 func TestProcessOutputMessageWithHandlers(t *testing.T) {
@@ -591,7 +594,12 @@ func getDataChannel() *DataChannel {
 }
 
 // GetClientMessage constructs and returns ClientMessage with given sequenceNumber, messageType & payload
-func getClientMessage(sequenceNumber int64, messageType string, payloadType uint32, payload []byte) message.ClientMessage {
+func getClientMessage(
+	sequenceNumber int64,
+	messageType string,
+	payloadType uint32,
+	payload []byte,
+) message.ClientMessage {
 	messageUUID, _ := uuid.Parse(messageId)
 	clientMessage := message.ClientMessage{
 		MessageType:    messageType,
@@ -599,14 +607,16 @@ func getClientMessage(sequenceNumber int64, messageType string, payloadType uint
 		CreatedDate:    createdDate,
 		SequenceNumber: sequenceNumber,
 		Flags:          2,
-		MessageId:      messageUUID,
+		MessageId:      *messageUUID,
 		PayloadType:    payloadType,
 		Payload:        payload,
 	}
 	return clientMessage
 }
 
-func getClientAndStreamingMessageList(size int) (serializedClientMessage [][]byte, streamingMessages []StreamingMessage) {
+func getClientAndStreamingMessageList(
+	size int,
+) (serializedClientMessage [][]byte, streamingMessages []StreamingMessage) {
 	var payload string
 	streamingMessages = make([]StreamingMessage, size)
 	serializedClientMessage = make([][]byte, size)

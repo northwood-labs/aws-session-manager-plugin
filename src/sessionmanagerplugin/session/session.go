@@ -23,16 +23,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
 
 	"github.com/aws/aws-sdk-go/service/ssm"
-	"github.com/aws/session-manager-plugin/src/datachannel"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
-	"github.com/aws/session-manager-plugin/src/retry"
-	"github.com/aws/session-manager-plugin/src/sdkutil"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
-	"github.com/aws/session-manager-plugin/src/version"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/datachannel"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/retry"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sdkutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/version"
 	"github.com/twinj/uuid"
 )
 
@@ -87,12 +87,12 @@ type Session struct {
 	DisplayMode           sessionutil.DisplayMode
 }
 
-//startSession create the datachannel for session
+// startSession create the datachannel for session
 var startSession = func(session *Session, log log.T) error {
 	return session.Execute(log)
 }
 
-//setSessionHandlersWithSessionType set session handlers based on session subtype
+// setSessionHandlersWithSessionType set session handlers based on session subtype
 var setSessionHandlersWithSessionType = func(session *Session, log log.T) error {
 	// SessionType is set inside DataChannel
 	sessionSubType := SessionRegistry[session.SessionType]
@@ -108,7 +108,10 @@ var handleStreamMessageResendTimeout = func(session *Session, log log.T) {
 			// Repeat this loop for every 200ms
 			time.Sleep(config.ResendSleepInterval)
 			if <-session.DataChannel.IsStreamMessageResendTimeout() {
-				log.Errorf("Terminating session %s as the stream data was not processed before timeout.", session.SessionId)
+				log.Errorf(
+					"Terminating session %s as the stream data was not processed before timeout.",
+					session.SessionId,
+				)
 				if err := session.TerminateSession(log); err != nil {
 					log.Errorf("Unable to terminate session upon stream data timeout. %v", err)
 				}
@@ -140,7 +143,7 @@ func ValidateInputAndStartSession(args []string, out io.Writer) {
 		target             string
 	)
 	log := log.Logger(true, "session-manager-plugin")
-	uuid.SwitchFormat(uuid.CleanHyphen)
+	uuid.SwitchFormat(uuid.FormatCanonical)
 
 	if len(args) == 1 {
 		fmt.Fprint(out, "\nThe Session Manager plugin was installed successfully. "+
@@ -217,7 +220,7 @@ func ValidateInputAndStartSession(args []string, out io.Writer) {
 	}
 }
 
-//Execute create data channel and start the session
+// Execute create data channel and start the session
 func (s *Session) Execute(log log.T) (err error) {
 	fmt.Fprintf(os.Stdout, "\nStarting session with SessionId: %s\n", s.SessionId)
 

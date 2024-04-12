@@ -43,7 +43,6 @@ func getApplicationName(clientName string) string {
 // otherwise returns the seelog default configurations
 // Linux uses seelog.xml file as configuration by default.
 func getLogConfigBytes(clientName string) (logConfigBytes []byte) {
-
 	applicationName := getApplicationName(clientName)
 	DefaultSeelogConfigFilePath = filepath.Join(DefaultInstallLocationPrefix, applicationName, SeelogConfigFileName)
 	DefaultLogDir = filepath.Join(DefaultInstallLocationPrefix, applicationName, LogsDirectory)

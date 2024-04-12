@@ -44,7 +44,6 @@ func (fileWatcher *FileWatcher) Init(log T, configFilePath string, replaceLogger
 
 // Start creates and starts the go routines for filewatcher
 func (fileWatcher *FileWatcher) Start() {
-
 	fileWatcher.log.Debugf("Start File Watcher On: %v", fileWatcher.configFilePath)
 
 	// Since the filewatcher fails if the file does not exist, need to watch the parent directory for any changes
@@ -75,7 +74,6 @@ func (fileWatcher *FileWatcher) Start() {
 
 // fileEventHandler implements handling of the events triggered by the OS
 func (fileWatcher *FileWatcher) fileEventHandler() {
-
 	// Waiting on signals from OS
 	for event := range fileWatcher.watcher.Events {
 		// Event signalled by OS on file

@@ -21,9 +21,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
 	"github.com/eiannone/keyboard"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
 )
 
 // Byte array for key inputs
@@ -58,11 +58,11 @@ func (s *ShellSession) Stop() {
 	os.Exit(0)
 }
 
-//handleKeyboardInput handles input entered by customer on terminal
+// handleKeyboardInput handles input entered by customer on terminal
 func (s *ShellSession) handleKeyboardInput(log log.T) (err error) {
 	var (
-		character rune         //character input from keyboard
-		key       keyboard.Key //special keys like arrows and function keys
+		character rune         // character input from keyboard
+		key       keyboard.Key // special keys like arrows and function keys
 	)
 	if err = keyboard.Open(); err != nil {
 		log.Errorf("Failed to load Keyboard: %v", err)

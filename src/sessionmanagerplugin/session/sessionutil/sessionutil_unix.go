@@ -23,12 +23,11 @@ import (
 	"net"
 	"os"
 
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
 )
 
-type DisplayMode struct {
-}
+type DisplayMode struct{}
 
 func (d *DisplayMode) InitDisplayMode(log log.T) {
 }

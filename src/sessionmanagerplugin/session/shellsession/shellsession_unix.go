@@ -24,11 +24,11 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
 )
 
-//disableEchoAndInputBuffering disables echo to avoid double echo and disable input buffering
+// disableEchoAndInputBuffering disables echo to avoid double echo and disable input buffering
 func (s *ShellSession) disableEchoAndInputBuffering() {
 	getState(&s.originalSttyState)
 	setState(bytes.NewBufferString("cbreak"))
@@ -58,13 +58,11 @@ func (s *ShellSession) Stop() {
 	os.Exit(0)
 }
 
-//handleKeyboardInput handles input entered by customer on terminal
+// handleKeyboardInput handles input entered by customer on terminal
 func (s *ShellSession) handleKeyboardInput(log log.T) (err error) {
-	var (
-		stdinBytesLen int
-	)
+	var stdinBytesLen int
 
-	//handle double echo and disable input buffering
+	// handle double echo and disable input buffering
 	s.disableEchoAndInputBuffering()
 
 	stdinBytes := make([]byte, StdinBufferLimit)

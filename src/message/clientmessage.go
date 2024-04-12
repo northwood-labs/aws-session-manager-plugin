@@ -15,7 +15,7 @@
 package message
 
 import (
-	"github.com/aws/session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 	"github.com/twinj/uuid"
 )
 

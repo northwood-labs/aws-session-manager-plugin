@@ -24,9 +24,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 	"github.com/twinj/uuid"
 )
+
+var emptyUUID = uuid.UUID{}
 
 // DeserializeClientMessage deserializes the byte array into an ClientMessage message.
 // * Payload is a variable length byte data.
@@ -34,7 +36,12 @@ import (
 // * |         MessageId                     |           Digest              | PayType | PayLen|
 // * |         Payload      			|
 func (clientMessage *ClientMessage) DeserializeClientMessage(log log.T, input []byte) (err error) {
-	clientMessage.MessageType, err = getString(log, input, ClientMessage_MessageTypeOffset, ClientMessage_MessageTypeLength)
+	clientMessage.MessageType, err = getString(
+		log,
+		input,
+		ClientMessage_MessageTypeOffset,
+		ClientMessage_MessageTypeLength,
+	)
 	if err != nil {
 		log.Errorf("Could not deserialize field MessageType with error: %v", err)
 		return err
@@ -64,7 +71,12 @@ func (clientMessage *ClientMessage) DeserializeClientMessage(log log.T, input []
 		log.Errorf("Could not deserialize field MessageId with error: %v", err)
 		return err
 	}
-	clientMessage.PayloadDigest, err = getBytes(log, input, ClientMessage_PayloadDigestOffset, ClientMessage_PayloadDigestLength)
+	clientMessage.PayloadDigest, err = getBytes(
+		log,
+		input,
+		ClientMessage_PayloadDigestOffset,
+		ClientMessage_PayloadDigestLength,
+	)
 	if err != nil {
 		log.Errorf("Could not deserialize field PayloadDigest with error: %v", err)
 		return err
@@ -96,7 +108,7 @@ func getString(log log.T, byteArray []byte, offset int, stringLength int) (resul
 		return "", errors.New("Offset is outside the byte array.")
 	}
 
-	//remove nulls from the bytes array
+	// remove nulls from the bytes array
 	b := bytes.Trim(byteArray[offset:offset+stringLength], "\x00")
 
 	return strings.TrimSpace(string(b)), nil
@@ -167,31 +179,31 @@ func getUuid(log log.T, byteArray []byte, offset int) (result uuid.UUID, err err
 	byteArrayLength := len(byteArray)
 	if offset > byteArrayLength-1 || offset+16-1 > byteArrayLength-1 || offset < 0 {
 		log.Error("getUuid failed: Offset is invalid.")
-		return nil, errors.New("Offset is outside the byte array.")
+		return emptyUUID, errors.New("Offset is outside the byte array.")
 	}
 
 	leastSignificantLong, err := getLong(log, byteArray, offset)
 	if err != nil {
 		log.Error("getUuid failed: failed to get uuid LSBs Long value.")
-		return nil, errors.New("Failed to get uuid LSBs long value.")
+		return emptyUUID, errors.New("Failed to get uuid LSBs long value.")
 	}
 
 	leastSignificantBytes, err := longToBytes(log, leastSignificantLong)
 	if err != nil {
 		log.Error("getUuid failed: failed to get uuid LSBs bytes value.")
-		return nil, errors.New("Failed to get uuid LSBs bytes value.")
+		return emptyUUID, errors.New("Failed to get uuid LSBs bytes value.")
 	}
 
 	mostSignificantLong, err := getLong(log, byteArray, offset+8)
 	if err != nil {
 		log.Error("getUuid failed: failed to get uuid MSBs Long value.")
-		return nil, errors.New("Failed to get uuid MSBs long value.")
+		return emptyUUID, errors.New("Failed to get uuid MSBs long value.")
 	}
 
 	mostSignificantBytes, err := longToBytes(log, mostSignificantLong)
 	if err != nil {
 		log.Error("getUuid failed: failed to get uuid MSBs bytes value.")
-		return nil, errors.New("Failed to get uuid MSBs bytes value.")
+		return emptyUUID, errors.New("Failed to get uuid MSBs bytes value.")
 	}
 
 	uuidBytes := append(mostSignificantBytes, leastSignificantBytes...)
@@ -414,7 +426,7 @@ func putBytes(log log.T, byteArray []byte, offsetStart int, offsetEnd int, input
 
 // putUuid puts the 128 bit uuid to an array of bytes starting from the offset.
 func putUuid(log log.T, byteArray []byte, offset int, input uuid.UUID) (err error) {
-	if input == nil {
+	if input == emptyUUID {
 		log.Error("putUuid failed: input is null.")
 		return errors.New("putUuid failed: input is null.")
 	}
@@ -485,8 +497,10 @@ func SerializeClientMessagePayload(log log.T, obj interface{}) (reply []byte, er
 }
 
 // SerializeClientMessageWithAcknowledgeContent marshals client message with payloads of acknowledge contents into bytes.
-func SerializeClientMessageWithAcknowledgeContent(log log.T, acknowledgeContent AcknowledgeContent) (reply []byte, err error) {
-
+func SerializeClientMessageWithAcknowledgeContent(
+	log log.T,
+	acknowledgeContent AcknowledgeContent,
+) (reply []byte, err error) {
 	acknowledgeContentBytes, err := SerializeClientMessagePayload(log, acknowledgeContent)
 	if err != nil {
 		// should not happen
@@ -494,7 +508,7 @@ func SerializeClientMessageWithAcknowledgeContent(log log.T, acknowledgeContent 
 		return
 	}
 
-	uuid.SwitchFormat(uuid.CleanHyphen)
+	uuid.SwitchFormat(uuid.FormatCanonical)
 	messageId := uuid.NewV4()
 	clientMessage := ClientMessage{
 		MessageType:    AcknowledgeMessage,
@@ -515,9 +529,14 @@ func SerializeClientMessageWithAcknowledgeContent(log log.T, acknowledgeContent 
 }
 
 // DeserializeDataStreamAcknowledgeContent parses acknowledge content from payload of ClientMessage.
-func (clientMessage *ClientMessage) DeserializeDataStreamAcknowledgeContent(log log.T) (dataStreamAcknowledge AcknowledgeContent, err error) {
+func (clientMessage *ClientMessage) DeserializeDataStreamAcknowledgeContent(
+	log log.T,
+) (dataStreamAcknowledge AcknowledgeContent, err error) {
 	if clientMessage.MessageType != AcknowledgeMessage {
-		err = fmt.Errorf("ClientMessage is not of type AcknowledgeMessage. Found message type: %s", clientMessage.MessageType)
+		err = fmt.Errorf(
+			"ClientMessage is not of type AcknowledgeMessage. Found message type: %s",
+			clientMessage.MessageType,
+		)
 		return
 	}
 
@@ -529,9 +548,14 @@ func (clientMessage *ClientMessage) DeserializeDataStreamAcknowledgeContent(log 
 }
 
 // DeserializeChannelClosedMessage parses channelClosed message from payload of ClientMessage.
-func (clientMessage *ClientMessage) DeserializeChannelClosedMessage(log log.T) (channelClosed ChannelClosed, err error) {
+func (clientMessage *ClientMessage) DeserializeChannelClosedMessage(
+	log log.T,
+) (channelClosed ChannelClosed, err error) {
 	if clientMessage.MessageType != ChannelClosedMessage {
-		err = fmt.Errorf("ClientMessage is not of type ChannelClosed. Found message type: %s", clientMessage.MessageType)
+		err = fmt.Errorf(
+			"ClientMessage is not of type ChannelClosed. Found message type: %s",
+			clientMessage.MessageType,
+		)
 		return
 	}
 
@@ -542,7 +566,9 @@ func (clientMessage *ClientMessage) DeserializeChannelClosedMessage(log log.T) (
 	return
 }
 
-func (clientMessage *ClientMessage) DeserializeHandshakeRequest(log log.T) (handshakeRequest HandshakeRequestPayload, err error) {
+func (clientMessage *ClientMessage) DeserializeHandshakeRequest(
+	log log.T,
+) (handshakeRequest HandshakeRequestPayload, err error) {
 	if clientMessage.PayloadType != uint32(HandshakeRequestPayloadType) {
 		err = log.Errorf("ClientMessage PayloadType is not of type HandshakeRequestPayloadType. Found payload type: %d",
 			clientMessage.PayloadType)
@@ -556,10 +582,14 @@ func (clientMessage *ClientMessage) DeserializeHandshakeRequest(log log.T) (hand
 	return
 }
 
-func (clientMessage *ClientMessage) DeserializeHandshakeComplete(log log.T) (handshakeComplete HandshakeCompletePayload, err error) {
+func (clientMessage *ClientMessage) DeserializeHandshakeComplete(
+	log log.T,
+) (handshakeComplete HandshakeCompletePayload, err error) {
 	if clientMessage.PayloadType != uint32(HandshakeCompletePayloadType) {
-		err = log.Errorf("ClientMessage PayloadType is not of type HandshakeCompletePayloadType. Found payload type: %d",
-			clientMessage.PayloadType)
+		err = log.Errorf(
+			"ClientMessage PayloadType is not of type HandshakeCompletePayloadType. Found payload type: %d",
+			clientMessage.PayloadType,
+		)
 		return
 	}
 

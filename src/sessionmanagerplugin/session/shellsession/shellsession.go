@@ -21,11 +21,11 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -66,14 +66,13 @@ func (s *ShellSession) Initialize(log log.T, sessionVar *session.Session) {
 
 // StartSession takes input and write it to data channel
 func (s *ShellSession) SetSessionHandlers(log log.T) (err error) {
-
 	// handle re-size
 	s.handleTerminalResize(log)
 
 	// handle control signals
 	s.handleControlSignals(log)
 
-	//handles keyboard input
+	// handles keyboard input
 	err = s.handleKeyboardInput(log)
 
 	return
@@ -134,7 +133,10 @@ func (s *ShellSession) handleTerminalResize(log log.T) {
 }
 
 // ProcessStreamMessagePayload prints payload received on datachannel to console
-func (s ShellSession) ProcessStreamMessagePayload(log log.T, outputMessage message.ClientMessage) (isHandlerReady bool, err error) {
+func (s ShellSession) ProcessStreamMessagePayload(
+	log log.T,
+	outputMessage message.ClientMessage,
+) (isHandlerReady bool, err error) {
 	s.DisplayMode.DisplayMessage(log, outputMessage)
 	return true, nil
 }

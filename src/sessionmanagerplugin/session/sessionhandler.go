@@ -21,20 +21,22 @@ import (
 
 	sdkSession "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
-	"github.com/aws/session-manager-plugin/src/retry"
-	"github.com/aws/session-manager-plugin/src/sdkutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/retry"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sdkutil"
 )
 
 // OpenDataChannel initializes datachannel
 func (s *Session) OpenDataChannel(log log.T) (err error) {
 	s.retryParams = retry.RepeatableExponentialRetryer{
-		GeometricRatio:      config.RetryBase,
-		InitialDelayInMilli: rand.Intn(config.DataChannelRetryInitialDelayMillis) + config.DataChannelRetryInitialDelayMillis,
-		MaxDelayInMilli:     config.DataChannelRetryMaxIntervalMillis,
-		MaxAttempts:         config.DataChannelNumMaxRetries,
+		GeometricRatio: config.RetryBase,
+		InitialDelayInMilli: rand.Intn(
+			config.DataChannelRetryInitialDelayMillis,
+		) + config.DataChannelRetryInitialDelayMillis,
+		MaxDelayInMilli: config.DataChannelRetryMaxIntervalMillis,
+		MaxAttempts:     config.DataChannelNumMaxRetries,
 	}
 
 	s.DataChannel.Initialize(log, s.ClientId, s.SessionId, s.TargetId, s.IsAwsCliUpgradeNeeded)
@@ -55,7 +57,11 @@ func (s *Session) OpenDataChannel(log log.T) (err error) {
 
 	s.DataChannel.GetWsChannel().SetOnError(
 		func(err error) {
-			log.Errorf("Trying to reconnect the session: %v with seq num: %d", s.StreamUrl, s.DataChannel.GetStreamDataSequenceNumber())
+			log.Errorf(
+				"Trying to reconnect the session: %v with seq num: %d",
+				s.StreamUrl,
+				s.DataChannel.GetStreamDataSequenceNumber(),
+			)
 			s.retryParams.CallableFunc = func() (err error) { return s.ResumeSessionHandler(log) }
 			if err = s.retryParams.Call(); err != nil {
 				log.Error(err)

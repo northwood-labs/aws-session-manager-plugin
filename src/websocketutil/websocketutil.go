@@ -17,8 +17,8 @@ package websocketutil
 import (
 	"errors"
 
-	"github.com/aws/session-manager-plugin/src/log"
 	"github.com/gorilla/websocket"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 )
 
 // IWebsocketUtil is the interface for the websocketutil.
@@ -35,7 +35,6 @@ type WebsocketUtil struct {
 
 // NewWebsocketUtil is the factory function for websocketutil.
 func NewWebsocketUtil(logger log.T, dialerInput *websocket.Dialer) *WebsocketUtil {
-
 	var websocketUtil *WebsocketUtil
 
 	if dialerInput == nil {
@@ -55,7 +54,6 @@ func NewWebsocketUtil(logger log.T, dialerInput *websocket.Dialer) *WebsocketUti
 
 // OpenConnection opens a websocket connection provided an input url.
 func (u *WebsocketUtil) OpenConnection(url string) (*websocket.Conn, error) {
-
 	u.log.Infof("Opening websocket connection to: ", url)
 
 	conn, _, err := u.dialer.Dial(url, nil)
@@ -71,7 +69,6 @@ func (u *WebsocketUtil) OpenConnection(url string) (*websocket.Conn, error) {
 
 // CloseConnection closes a websocket connection given the Conn object as input.
 func (u *WebsocketUtil) CloseConnection(ws *websocket.Conn) error {
-
 	if ws == nil {
 		return errors.New("websocket conn object is nil")
 	}

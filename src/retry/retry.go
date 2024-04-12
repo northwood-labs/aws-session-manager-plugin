@@ -17,14 +17,13 @@ package retry
 import (
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 )
 
 const sleepConstant = 2
 
 // Retry implements back off retry strategy for reconnect web socket connection.
 func Retry(log log.T, attempts int, sleep time.Duration, fn func() error) (err error) {
-
 	log.Info("Retrying connection to channel")
 	for attempts > 0 {
 		attempts--

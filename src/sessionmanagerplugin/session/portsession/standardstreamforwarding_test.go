@@ -19,9 +19,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/datachannel"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/datachannel"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
 	"github.com/stretchr/testify/assert"
 )
 

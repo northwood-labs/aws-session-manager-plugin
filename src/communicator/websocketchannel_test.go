@@ -23,8 +23,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/aws/session-manager-plugin/src/log"
 	"github.com/gorilla/websocket"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -65,7 +65,7 @@ var upgrader = websocket.Upgrader{
 // handlerToBeTested echos all incoming input from a websocket connection back to the client while
 // adding the word "echo".
 func handlerToBeTested(w http.ResponseWriter, req *http.Request) {
-	var log = log.NewMockLog()
+	log := log.NewMockLog()
 	conn, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("cannot upgrade: %v", err), http.StatusInternalServerError)
@@ -73,13 +73,12 @@ func handlerToBeTested(w http.ResponseWriter, req *http.Request) {
 
 	for {
 		mt, p, err := conn.ReadMessage()
-
 		if err != nil {
 			log.Errorf("error: %v", err)
 			return
 		}
 
-		//echo back the same sent string from the client while adding "echo" at the beginning
+		// echo back the same sent string from the client while adding "echo" at the beginning
 		conn.WriteMessage(mt, []byte("echo "+string(p)))
 	}
 }
@@ -152,7 +151,7 @@ func TestOpenCloseWebSocketChannel(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(handlerToBeTested))
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
-	var log = log.NewMockLog()
+	log := log.NewMockLog()
 
 	websocketchannel := WebSocketChannel{
 		Url: u.String(),
@@ -174,7 +173,7 @@ func TestReadWriteTextToWebSocketChannel(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(handlerToBeTested))
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
-	var log = log.NewMockLog()
+	log := log.NewMockLog()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -211,7 +210,7 @@ func TestReadWriteBinaryToWebSocketChannel(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(handlerToBeTested))
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
-	var log = log.NewMockLog()
+	log := log.NewMockLog()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -248,7 +247,7 @@ func TestMultipleReadWriteWebSocketChannel(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(handlerToBeTested))
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
-	var log = log.NewMockLog()
+	log := log.NewMockLog()
 
 	read1 := make(chan bool)
 	read2 := make(chan bool)

@@ -23,14 +23,14 @@ import (
 
 	sdkSession "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
-	"github.com/aws/session-manager-plugin/src/datachannel"
-	"github.com/aws/session-manager-plugin/src/jsonutil"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/sdkutil"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session"
-	_ "github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session/portsession"
-	_ "github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session/shellsession"
-	"github.com/aws/session-manager-plugin/src/ssmclicommands/utils"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/datachannel"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/jsonutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sdkutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session"
+	_ "github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session/portsession"
+	_ "github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session/shellsession"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/ssmclicommands/utils"
 	"github.com/twinj/uuid"
 )
 
@@ -88,7 +88,7 @@ type StartSessionCommand struct {
 	sdk      *ssm.SSM
 }
 
-//getSSMClient generate ssm client by configuration
+// getSSMClient generate ssm client by configuration
 var getSSMClient = func(log log.T, region string, profile string, endpoint string) (*ssm.SSM, error) {
 	sdkutil.SetRegionAndProfile(region, profile)
 
@@ -101,7 +101,7 @@ var getSSMClient = func(log log.T, region string, profile string, endpoint strin
 	return ssm.New(sdkSession), nil
 }
 
-//executeSession to open datachannel
+// executeSession to open datachannel
 var executeSession = func(log log.T, session *session.Session) (err error) {
 	return session.Execute(log)
 }
@@ -141,7 +141,7 @@ func (c *StartSessionCommand) Help() string {
 	return c.helpText
 }
 
-//validates and execute start-session command
+// validates and execute start-session command
 func (s *StartSessionCommand) Execute(parameters map[string][]string) (error, string) {
 	var (
 		err        error
@@ -202,13 +202,13 @@ func (s *StartSessionCommand) Execute(parameters map[string][]string) (error, st
 	return err, "StartSession executed successfully"
 }
 
-//func to validate start-session input
+// func to validate start-session input
 func (StartSessionCommand) validateStartSessionInput(parameters map[string][]string) []string {
 	validation := make([]string, 0)
 
 	instanceIdValue := parameters[INSTANCE_ID]
 
-	//look for required parameters
+	// look for required parameters
 	if instanceIdValue == nil {
 		validation = append(validation, fmt.Sprintf("%v is required",
 			utils.FormatFlag(INSTANCE_ID)))
@@ -233,9 +233,12 @@ func contains(arr []string, item string) bool {
 }
 
 // function to get start-session parameters
-func (s *StartSessionCommand) getStartSessionParams(log log.T, parameters map[string][]string) (string, string, string, error) {
-	//Fetch command token
-	uuid.SwitchFormat(uuid.CleanHyphen)
+func (s *StartSessionCommand) getStartSessionParams(
+	log log.T,
+	parameters map[string][]string,
+) (string, string, string, error) {
+	// Fetch command token
+	uuid.SwitchFormat(uuid.FormatCanonical)
 
 	startSessionInput := ssm.StartSessionInput{
 		Target: &parameters[INSTANCE_ID][0],

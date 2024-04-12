@@ -19,10 +19,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/websocketutil"
 	"github.com/gorilla/websocket"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/websocketutil"
 )
 
 // IWebSocketChannel is the interface for DataChannel.
@@ -84,7 +84,6 @@ func (webSocketChannel *WebSocketChannel) Initialize(log log.T, channelUrl strin
 
 // StartPings starts the pinging process to keep the websocket channel alive.
 func (webSocketChannel *WebSocketChannel) StartPings(log log.T, pingInterval time.Duration) {
-
 	go func() {
 		for {
 			if webSocketChannel.IsOpen == false {
@@ -123,7 +122,6 @@ func (webSocketChannel *WebSocketChannel) SendMessage(log log.T, input []byte, i
 
 // Close closes the corresponding connection.
 func (webSocketChannel *WebSocketChannel) Close(log log.T) error {
-
 	log.Info("Closing websocket channel connection to: " + webSocketChannel.Url)
 	if webSocketChannel.IsOpen == true {
 		// Send signal to stop receiving message
@@ -172,14 +170,15 @@ func (webSocketChannel *WebSocketChannel) Open(log log.T) error {
 					webSocketChannel.OnError(err)
 					break
 				}
-				log.Debugf("An error happened when receiving the message. Retried times: %v, Error: %v, Messagetype: %v",
+				log.Debugf(
+					"An error happened when receiving the message. Retried times: %v, Error: %v, Messagetype: %v",
 					retryCount,
 					err.Error(),
-					messageType)
+					messageType,
+				)
 			} else if messageType != websocket.TextMessage && messageType != websocket.BinaryMessage {
 				// We only accept text messages which are interpreted as UTF-8 or binary encoded text.
 				log.Errorf("Invalid message type. We only accept UTF-8 or binary encoded text. Message type: %v", messageType)
-
 			} else {
 				retryCount = 0
 				webSocketChannel.OnMessage(rawMessage)

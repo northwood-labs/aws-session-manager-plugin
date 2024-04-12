@@ -10,4 +10,4 @@
 /vendor/pkg/
 bin/
 build
-vendor/src/github.com/aws/session-manager-plugin
+vendor/src/github.com/northwood-labs/aws-session-manager-plugin

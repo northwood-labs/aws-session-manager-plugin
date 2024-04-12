@@ -20,11 +20,13 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/session-manager-plugin/src/sdkutil/retryer"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sdkutil/retryer"
 )
 
-var defaultRegion string
-var defaultProfile string
+var (
+	defaultRegion  string
+	defaultProfile string
+)
 
 // GetNewSessionWithEndpoint creates aws sdk session with given profile, region and endpoint
 func GetNewSessionWithEndpoint(endpoint string) (sess *session.Session, err error) {

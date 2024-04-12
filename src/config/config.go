@@ -44,7 +44,7 @@ const (
 	InteractiveCommandsPluginName    = "InteractiveCommands"
 	NonInteractiveCommandsPluginName = "NonInteractiveCommands"
 
-	//Agent Versions
+	// Agent Versions
 	TerminateSessionFlagSupportedAfterThisAgentVersion            = "2.3.722.0"
 	TCPMultiplexingSupportedAfterThisAgentVersion                 = "3.0.196.0"
 	TCPMultiplexingWithSmuxKeepAliveDisabledAfterThisAgentVersion = "3.1.1511.0"

@@ -19,8 +19,8 @@ import (
 	sdkSession "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/sdkutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sdkutil"
 )
 
 // KMSKeySizeInBytes is the key size that is fetched from KMS. 64 bytes key is split into two halves.
@@ -37,10 +37,16 @@ func NewKMSService(log log.T) (kmsService *kms.KMS, err error) {
 	return kmsService, nil
 }
 
-func KMSDecrypt(log log.T, svc kmsiface.KMSAPI, ciptherTextBlob []byte, encryptionContext map[string]*string) (plainText []byte, err error) {
+func KMSDecrypt(
+	log log.T,
+	svc kmsiface.KMSAPI,
+	ciptherTextBlob []byte,
+	encryptionContext map[string]*string,
+) (plainText []byte, err error) {
 	output, err := svc.Decrypt(&kms.DecryptInput{
 		CiphertextBlob:    ciptherTextBlob,
-		EncryptionContext: encryptionContext})
+		EncryptionContext: encryptionContext,
+	})
 	if err != nil {
 		log.Error("Error when decrypting data key", err)
 		return nil, err
@@ -49,7 +55,11 @@ func KMSDecrypt(log log.T, svc kmsiface.KMSAPI, ciptherTextBlob []byte, encrypti
 }
 
 // GenerateDataKey gets cipher text and plain text keys from KMS service
-func KMSGenerateDataKey(kmsKeyId string, svc kmsiface.KMSAPI, context map[string]*string) (cipherTextKey []byte, plainTextKey []byte, err error) {
+func KMSGenerateDataKey(
+	kmsKeyId string,
+	svc kmsiface.KMSAPI,
+	context map[string]*string,
+) (cipherTextKey []byte, plainTextKey []byte, err error) {
 	kmsKeySize := KMSKeySizeInBytes
 	generateDataKeyInput := kms.GenerateDataKeyInput{
 		KeyId:             &kmsKeyId,

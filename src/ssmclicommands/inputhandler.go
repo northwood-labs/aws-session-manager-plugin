@@ -20,7 +20,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/aws/session-manager-plugin/src/ssmclicommands/utils"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/ssmclicommands/utils"
 	"github.com/twinj/uuid"
 )
 
@@ -29,7 +29,9 @@ const (
 )
 
 // ParseCliCommand function parses command and returns options to validate.
-func ParseCliCommand(args []string) (err error, options []string, command string, subcommand string, parameters map[string][]string) {
+func ParseCliCommand(
+	args []string,
+) (err error, options []string, command string, subcommand string, parameters map[string][]string) {
 	argCount := len(args)
 	pos := 1
 
@@ -51,7 +53,7 @@ func ParseCliCommand(args []string) (err error, options []string, command string
 	command = strings.ToLower(args[pos])
 	pos++
 
-	//subcommand
+	// subcommand
 	if pos >= argCount {
 		return
 	}
@@ -87,7 +89,7 @@ func ParseCliCommand(args []string) (err error, options []string, command string
 
 // ValidateInput function validates the input and displays response accordingly.
 func ValidateInput(args []string, out io.Writer) {
-	uuid.SwitchFormat(uuid.CleanHyphen)
+	uuid.SwitchFormat(uuid.FormatCanonical)
 
 	if len(args) < ArgumentLength {
 		utils.DisplayCommandUsage(out)

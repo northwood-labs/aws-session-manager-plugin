@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"testing"
 
-	wsChannelMock "github.com/aws/session-manager-plugin/src/communicator/mocks"
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/datachannel"
-	dataChannelMock "github.com/aws/session-manager-plugin/src/datachannel/mocks"
-	"github.com/aws/session-manager-plugin/src/message"
+	wsChannelMock "github.com/northwood-labs/aws-session-manager-plugin/src/communicator/mocks"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/datachannel"
+	dataChannelMock "github.com/northwood-labs/aws-session-manager-plugin/src/datachannel/mocks"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
@@ -55,7 +55,7 @@ func TestOpenDataChannelWithError(t *testing.T) {
 	sessionMock.DataChannel = mockDataChannel
 	SetupMockActions()
 
-	//First reconnection failed when open datachannel, success after retry
+	// First reconnection failed when open datachannel, success after retry
 	mockDataChannel.On("Open", mock.Anything).Return(fmt.Errorf("error"))
 	mockDataChannel.On("Reconnect", mock.Anything).Return(fmt.Errorf("error")).Once()
 	mockDataChannel.On("Reconnect", mock.Anything).Return(nil).Once()

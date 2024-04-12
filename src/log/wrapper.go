@@ -32,7 +32,6 @@ type Wrapper struct {
 
 // FormatFilter can modify the format and or parameters to be passed to a logger.
 type FormatFilter interface {
-
 	// Filter modifies parameters that will be passed to log.Debug, log.Info, etc.
 	Filter(params ...interface{}) (newParams []interface{})
 

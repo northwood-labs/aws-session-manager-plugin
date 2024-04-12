@@ -19,15 +19,13 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aws/session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	callableFunc = func() error {
-		return errors.New("Error occured in callable function")
-	}
-)
+var callableFunc = func() error {
+	return errors.New("Error occured in callable function")
+}
 
 func TestRepeatableExponentialRetryerRetriesForGivenNumberOfMaxRetries(t *testing.T) {
 	retryer := RepeatableExponentialRetryer{

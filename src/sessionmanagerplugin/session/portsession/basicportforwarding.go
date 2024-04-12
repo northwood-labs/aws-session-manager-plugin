@@ -22,12 +22,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
-	"github.com/aws/session-manager-plugin/src/version"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/version"
 )
 
 // BasicPortForwarding is type of port session
@@ -148,7 +148,11 @@ func (p *BasicPortForwarding) startLocalListener(log log.T, portNumber string) (
 		if listener, err = getNewListener(p.portParameters.LocalConnectionType, p.portParameters.LocalUnixSocket); err != nil {
 			return
 		}
-		displayMessage = fmt.Sprintf("Unix socket %s opened for sessionId %s.", p.portParameters.LocalUnixSocket, p.sessionId)
+		displayMessage = fmt.Sprintf(
+			"Unix socket %s opened for sessionId %s.",
+			p.portParameters.LocalUnixSocket,
+			p.sessionId,
+		)
 	default:
 		if listener, err = getNewListener("tcp", "localhost:"+portNumber); err != nil {
 			return

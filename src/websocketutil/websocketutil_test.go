@@ -21,8 +21,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/aws/session-manager-plugin/src/log"
 	"github.com/gorilla/websocket"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,7 +37,6 @@ func handlerToBeTested(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, fmt.Sprintf("cannot upgrade: %v", err), http.StatusInternalServerError)
 	}
 	mt, p, err := conn.ReadMessage()
-
 	if err != nil {
 		return
 	}
@@ -48,8 +47,8 @@ func TestWebsocketUtilOpenCloseConnection(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(handlerToBeTested))
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
-	var log = log.NewMockLog()
-	var ws = NewWebsocketUtil(log, nil)
+	log := log.NewMockLog()
+	ws := NewWebsocketUtil(log, nil)
 	conn, _ := ws.OpenConnection(u.String())
 	assert.NotNil(t, conn, "Open connection failed.")
 
@@ -61,8 +60,8 @@ func TestWebsocketUtilOpenConnectionInvalidUrl(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(handlerToBeTested))
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
-	var log = log.NewMockLog()
-	var ws = NewWebsocketUtil(log, nil)
+	log := log.NewMockLog()
+	ws := NewWebsocketUtil(log, nil)
 	conn, _ := ws.OpenConnection("InvalidUrl")
 	assert.Nil(t, conn, "Open connection failed.")
 
@@ -74,8 +73,8 @@ func TestSendMessage(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(handlerToBeTested))
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
-	var log = log.NewMockLog()
-	var ws = NewWebsocketUtil(log, nil)
+	log := log.NewMockLog()
+	ws := NewWebsocketUtil(log, nil)
 	conn, _ := ws.OpenConnection(u.String())
 	assert.NotNil(t, conn, "Open connection failed.")
 	conn.WriteMessage(websocket.TextMessage, []byte("testing testing"))

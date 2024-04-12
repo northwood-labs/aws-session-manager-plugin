@@ -22,9 +22,9 @@ import (
 	"testing"
 	"time"
 
-	wsChannelMock "github.com/aws/session-manager-plugin/src/communicator/mocks"
-	dataChannelMock "github.com/aws/session-manager-plugin/src/datachannel/mocks"
-	"github.com/aws/session-manager-plugin/src/log"
+	wsChannelMock "github.com/northwood-labs/aws-session-manager-plugin/src/communicator/mocks"
+	dataChannelMock "github.com/northwood-labs/aws-session-manager-plugin/src/datachannel/mocks"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -52,9 +52,11 @@ func TestValidateInputAndStartSessionWithWrongInputArgument(t *testing.T) {
 func TestValidateInputAndStartSession(t *testing.T) {
 	var buffer bytes.Buffer
 	sessionResponse := "{\"SessionId\": \"user-012345\", \"TokenValue\": \"ABCD\", \"StreamUrl\": \"wss://ssmmessages.us-east-1.amazonaws.com/v1/data-channel/user-012345?role=publish_subscribe\"}"
-	args := []string{"session-manager-plugin",
+	args := []string{
+		"session-manager-plugin",
 		sessionResponse,
-		"us-east-1", "StartSession", "", "{\"Target\": \"i-0123abc\"}", "https://ssm.us-east-1.amazonaws.com"}
+		"us-east-1", "StartSession", "", "{\"Target\": \"i-0123abc\"}", "https://ssm.us-east-1.amazonaws.com",
+	}
 	startSession = func(session *Session, log log.T) error {
 		return fmt.Errorf("Some error")
 	}
@@ -66,9 +68,11 @@ func TestValidateInputAndStartSessionWithEnvVariableParameter(t *testing.T) {
 	var buffer bytes.Buffer
 	sessionResponse := "{\"SessionId\": \"user-012345\", \"TokenValue\": \"Session-Token\", \"StreamUrl\": \"wss://ssmmessages.us-east-1.amazonaws.com/v1/data-channel/user-012345?role=publish_subscribe\"}"
 	os.Setenv("AWS_SSM_START_SESSION_RESPONSE", sessionResponse)
-	args := []string{"session-manager-plugin",
+	args := []string{
+		"session-manager-plugin",
 		"AWS_SSM_START_SESSION_RESPONSE",
-		"us-east-1", "StartSession", "", "{\"Target\": \"i-0123abc\"}", "https://ssm.us-east-1.amazonaws.com"}
+		"us-east-1", "StartSession", "", "{\"Target\": \"i-0123abc\"}", "https://ssm.us-east-1.amazonaws.com",
+	}
 	parameterPassed := false
 	startSession = func(session *Session, log log.T) error {
 		if session.TokenValue == "Session-Token" && session.SessionId == "user-012345" {
@@ -78,7 +82,7 @@ func TestValidateInputAndStartSessionWithEnvVariableParameter(t *testing.T) {
 	}
 
 	ValidateInputAndStartSession(args, &buffer)
-	var _, envVariableExist = os.LookupEnv("AWS_SSM_START_SESSION_RESPONSE")
+	_, envVariableExist := os.LookupEnv("AWS_SSM_START_SESSION_RESPONSE")
 	assert.False(t, envVariableExist)
 	assert.True(t, parameterPassed)
 }
@@ -87,9 +91,11 @@ func TestValidateInputAndStartSessionWithWrongEnvVariableName(t *testing.T) {
 	var buffer bytes.Buffer
 	sessionResponse := "{\"SessionId\": \"user-012345\", \"TokenValue\": \"Session-Token\", \"StreamUrl\": \"wss://ssmmessages.us-east-1.amazonaws.com/v1/data-channel/user-012345?role=publish_subscribe\"}"
 	os.Setenv("WRONG_ENV_NAME", sessionResponse)
-	args := []string{"session-manager-plugin",
+	args := []string{
+		"session-manager-plugin",
 		"WRONG_ENV_NAME",
-		"us-east-1", "StartSession", "", "{\"Target\": \"i-0123abc\"}", "https://ssm.us-east-1.amazonaws.com"}
+		"us-east-1", "StartSession", "", "{\"Target\": \"i-0123abc\"}", "https://ssm.us-east-1.amazonaws.com",
+	}
 	startSessionInvoked := false
 	startSession = func(session *Session, log log.T) error {
 		startSessionInvoked = true
@@ -97,7 +103,7 @@ func TestValidateInputAndStartSessionWithWrongEnvVariableName(t *testing.T) {
 	}
 
 	ValidateInputAndStartSession(args, &buffer)
-	var _, envVariableExist = os.LookupEnv("WRONG_ENV_NAME")
+	_, envVariableExist := os.LookupEnv("WRONG_ENV_NAME")
 	assert.Contains(t, buffer.String(), "Cannot perform start session: invalid character 'W'")
 	assert.True(t, envVariableExist)
 	assert.False(t, startSessionInvoked)

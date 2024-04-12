@@ -29,12 +29,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/session-manager-plugin/src/config"
-	"github.com/aws/session-manager-plugin/src/log"
-	"github.com/aws/session-manager-plugin/src/message"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session"
-	"github.com/aws/session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
-	"github.com/aws/session-manager-plugin/src/version"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/config"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/log"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/message"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/sessionmanagerplugin/session/sessionutil"
+	"github.com/northwood-labs/aws-session-manager-plugin/src/version"
 	"github.com/xtaci/smux"
 	"golang.org/x/sync/errgroup"
 )
@@ -92,7 +92,6 @@ func (p *MuxPortForwarding) Stop() {
 
 // InitializeStreams initializes i/o streams
 func (p *MuxPortForwarding) InitializeStreams(log log.T, agentVersion string) (err error) {
-
 	p.handleControlSignals(log)
 	p.socketFile = getUnixSocketPath(p.sessionId, os.TempDir(), "session_manager_plugin_mux.sock")
 
@@ -144,7 +143,6 @@ func (p *MuxPortForwarding) cleanUp() {
 
 // initialize opens a network connection that acts as smux client
 func (p *MuxPortForwarding) initialize(log log.T, agentVersion string) (err error) {
-
 	// open a network listener
 	var listener net.Listener
 	if listener, err = sessionutil.NewListener(log, p.socketFile); err != nil {
@@ -236,7 +234,11 @@ func (p *MuxPortForwarding) handleClientConnections(log log.T, ctx context.Conte
 		if listener, err = net.Listen(p.portParameters.LocalConnectionType, p.portParameters.LocalUnixSocket); err != nil {
 			return err
 		}
-		displayMsg = fmt.Sprintf("Unix socket %s opened for sessionId %s.", p.portParameters.LocalUnixSocket, p.sessionId)
+		displayMsg = fmt.Sprintf(
+			"Unix socket %s opened for sessionId %s.",
+			p.portParameters.LocalUnixSocket,
+			p.sessionId,
+		)
 	} else {
 		localPortNumber := p.portParameters.LocalPortNumber
 		if p.portParameters.LocalPortNumber == "" {
